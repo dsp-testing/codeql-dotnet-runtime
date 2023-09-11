@@ -1,0 +1,34 @@
+name: CodeQL
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: dotnet/runtime
+          ref: 533da06f35e320672e9be356d699fb38af63180b
+
+      - name: Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install autoconf automake make cmake libtool binutils clang llvm zlib1g-dev libssl-dev libicu-dev liblttng-ust-dev libkrb5-dev
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Build
+        run:
+          ./build.sh --subset mono+libs
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          upload: false
+          skip-queries: true
